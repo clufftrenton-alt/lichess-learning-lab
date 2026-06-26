@@ -199,7 +199,7 @@ async function createStudy() {
   if (!selected.length) return setStatus("No critical moments were found to add to a study.", "error");
 
   const studyName = $("studyName").value || `Learning Lab - ${dateRangeLabel()}`;
-  setStatus(`Creating an interactive lesson from ${selected.length} selected moments...`);
+  setStatus(`Creating short interactive lesson chapters from ${selected.length} selected moments...`);
   const data = await postJson("/api/create-study", {
     token: state.token,
     username: state.username,
