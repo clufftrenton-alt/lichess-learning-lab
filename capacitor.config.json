@@ -1,0 +1,9 @@
+{
+  "appId": "com.lichesslearninglab.app",
+  "appName": "Lichess Learning Lab",
+  "webDir": "public",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
+}

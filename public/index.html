@@ -35,6 +35,11 @@
         </label>
 
         <label>
+          Backend URL
+          <input id="apiBase" placeholder="Leave blank on this computer">
+        </label>
+
+        <label>
           Max games in range
           <input id="maxGames" type="number" min="1" max="300" value="100">
         </label>
@@ -55,7 +60,7 @@
         <button id="autoStudy" class="primary">Auto-create lesson</button>
 
         <div class="notice">
-          Your token is used only by this local app to call Lichess. It is not saved on disk.
+          Your token is used only to call Lichess. Leave Backend URL blank here; on phone, use a hosted backend URL.
         </div>
       </section>
 

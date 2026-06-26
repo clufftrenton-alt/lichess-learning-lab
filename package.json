@@ -4,12 +4,18 @@
   "private": true,
   "description": "Review your Lichess games, find critical moments, and create study chapters from them.",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "cap:add:android": "cap add android",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
     "chess.js": "^1.4.0"
   }
 }

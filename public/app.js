@@ -7,6 +7,15 @@ const state = {
 
 const $ = (id) => document.getElementById(id);
 
+function loadSavedSettings() {
+  const savedApiBase = localStorage.getItem("learningLabApiBase") || "";
+  if ($("apiBase")) $("apiBase").value = savedApiBase;
+}
+
+function saveSettings() {
+  if ($("apiBase")) localStorage.setItem("learningLabApiBase", $("apiBase").value.trim());
+}
+
 function setStatus(message, type = "info") {
   const status = $("status");
   status.hidden = !message;
@@ -15,7 +24,9 @@ function setStatus(message, type = "info") {
 }
 
 async function postJson(url, body) {
-  const response = await fetch(url, {
+  const apiBase = $("apiBase")?.value.trim().replace(/\/$/, "") || "";
+  saveSettings();
+  const response = await fetch(`${apiBase}${url}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -251,4 +262,5 @@ $("autoStudy").addEventListener("click", async () => {
 });
 
 setDefaultDateRange();
+loadSavedSettings();
 renderGames();

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Lichess Learning Lab</string>
+    <string name="title_activity_main">Lichess Learning Lab</string>
+    <string name="package_name">com.lichesslearninglab.app</string>
+    <string name="custom_url_scheme">com.lichesslearninglab.app</string>
+</resources>

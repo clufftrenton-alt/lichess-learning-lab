@@ -20,6 +20,7 @@ function send(res, status, data, headers = {}) {
   const body = typeof data === "string" ? data : JSON.stringify(data);
   res.writeHead(status, {
     "Content-Type": typeof data === "string" ? "text/plain; charset=utf-8" : "application/json; charset=utf-8",
+    ...corsHeaders(res.reqOrigin),
     ...headers,
   });
   res.end(body);
@@ -27,6 +28,23 @@ function send(res, status, data, headers = {}) {
 
 function sendJson(res, status, data) {
   send(res, status, data, { "Content-Type": "application/json; charset=utf-8" });
+}
+
+function corsHeaders(origin) {
+  const allowed = new Set([
+    "http://localhost:5177",
+    "http://127.0.0.1:5177",
+    "capacitor://localhost",
+    "ionic://localhost",
+  ]);
+
+  if (!allowed.has(origin)) return {};
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Vary": "Origin",
+  };
 }
 
 async function readJson(req) {
@@ -517,6 +535,8 @@ function serveStatic(req, res) {
 
 const server = http.createServer(async (req, res) => {
   try {
+    res.reqOrigin = req.headers.origin || "";
+    if (req.method === "OPTIONS") return send(res, 204, "");
     if (req.url.startsWith("/api/")) return await handleApi(req, res);
     return serveStatic(req, res);
   } catch (error) {
