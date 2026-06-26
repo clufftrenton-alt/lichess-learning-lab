@@ -16,6 +16,17 @@ The project now includes a web app manifest, so it can be installed like an app 
 
 For a true Android APK, the app needs to be wrapped with Android tooling such as Capacitor or Bubblewrap after it is hosted. This local workspace does not currently include the Android SDK needed to build an APK directly.
 
+## Hosting
+
+The app can run as a hosted HTTPS Node service. One simple path is Render:
+
+1. Connect the GitHub repo to Render.
+2. Create a new Blueprint from `render.yaml`.
+3. Deploy the `lichess-learning-lab` web service.
+4. Use the deployed HTTPS URL as the phone app's **Backend URL**.
+
+When the frontend and backend are hosted together, leave **Backend URL** blank because the app can call its own `/api` routes.
+
 ## Lichess token
 
 Create a token at <https://lichess.org/account/oauth/token/create> with:
