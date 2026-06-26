@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lichess Learning Lab</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="panel sidebar">
+        <div class="brand">
+          <div class="mark">LL</div>
+          <div>
+            <h1>Lichess Learning Lab</h1>
+            <p>Turn your own mistakes into study chapters.</p>
+          </div>
+        </div>
+
+        <label>
+          Lichess token
+          <input id="token" type="password" autocomplete="off" placeholder="Token with game:read and study:write">
+        </label>
+
+        <div class="row">
+          <button id="connect" class="primary">Connect</button>
+          <a class="subtle" href="https://lichess.org/account/oauth/token/create?scopes[]=game:read&scopes[]=study:write" target="_blank" rel="noreferrer">Get token</a>
+        </div>
+
+        <label>
+          Username
+          <input id="username" placeholder="Your Lichess username">
+        </label>
+
+        <label>
+          Games to review
+          <input id="maxGames" type="number" min="1" max="100" value="20">
+        </label>
+
+        <button id="loadGames">Review games</button>
+
+        <div class="notice">
+          Your token is used only by this local app to call Lichess. It is not saved on disk.
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div>
+            <h2>Critical Moments</h2>
+            <p id="summary">Connect, load games, then choose what belongs in your study.</p>
+          </div>
+          <div class="study-actions">
+            <input id="studyName" placeholder="Study name">
+            <button id="createStudy" class="primary">Create study</button>
+          </div>
+        </div>
+
+        <section id="status" class="status" hidden></section>
+        <section id="games" class="games empty">
+          <div class="empty-state">
+            <h3>No games loaded yet</h3>
+            <p>Analysed Lichess games will appear here with blunders, mistakes, inaccuracies, and sharp evaluation swings.</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,311 @@
+:root {
+  color-scheme: light;
+  --ink: #172026;
+  --muted: #687580;
+  --line: #dce3e8;
+  --panel: #ffffff;
+  --wash: #f5f7f8;
+  --blue: #1f6fbf;
+  --blue-dark: #15538f;
+  --green: #23705a;
+  --red: #a13d37;
+  --amber: #946412;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background: var(--wash);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) 1fr;
+  min-height: 100vh;
+}
+
+.panel {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #1f2a33;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+.brand p,
+.toolbar p,
+.game-card p,
+.quiet,
+.notice {
+  color: var(--muted);
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: #33424d;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 11px;
+  background: #ffffff;
+  color: var(--ink);
+}
+
+button {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 14px;
+  background: #ffffff;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 750;
+}
+
+button:hover {
+  border-color: #b8c5ce;
+}
+
+button.primary {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #ffffff;
+}
+
+button.primary:hover {
+  background: var(--blue-dark);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.subtle {
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.notice {
+  border: 1px solid #d9e6d6;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f4faf2;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.workspace {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 18px;
+  padding: 28px;
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+}
+
+.toolbar h2 {
+  font-size: 28px;
+}
+
+.study-actions {
+  display: grid;
+  grid-template-columns: minmax(210px, 320px) auto;
+  gap: 10px;
+}
+
+.status {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.status.success {
+  border-color: #c5dfd6;
+  color: var(--green);
+}
+
+.status.error {
+  border-color: #efc7c3;
+  color: var(--red);
+}
+
+.games {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.games.empty {
+  place-items: center;
+}
+
+.empty-state {
+  max-width: 520px;
+  text-align: center;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.game-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.game-card header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.game-card h3 {
+  font-size: 17px;
+}
+
+.game-card a {
+  color: var(--blue);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.opening {
+  margin: 12px 0;
+}
+
+.opening span {
+  display: inline-block;
+  border: 1px solid #d8d1bd;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: #fffaf0;
+  color: var(--amber);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.moments {
+  display: grid;
+  gap: 8px;
+}
+
+.moment {
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 400;
+}
+
+.moment input {
+  width: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+}
+
+.moment strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.moment p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.moment small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .toolbar,
+  .game-card header {
+    display: grid;
+  }
+
+  .study-actions {
+    grid-template-columns: 1fr;
+  }
+}

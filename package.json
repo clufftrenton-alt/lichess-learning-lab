@@ -1,0 +1,12 @@
+{
+  "name": "lichess-learning-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Review your Lichess games, find critical moments, and create study chapters from them.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
