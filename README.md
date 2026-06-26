@@ -14,7 +14,6 @@ Open <http://localhost:5177>.
 
 Create a token at <https://lichess.org/account/oauth/token/create> with:
 
-- `game:read`
 - `study:write`
 
 The app sends the token only to your local server, and the local server uses it only for Lichess API calls. It is not saved to disk.
