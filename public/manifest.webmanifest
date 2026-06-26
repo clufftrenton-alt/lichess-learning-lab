@@ -1,0 +1,18 @@
+{
+  "name": "Lichess Learning Lab",
+  "short_name": "Learning Lab",
+  "description": "Create short Lichess lesson studies from your own critical moments.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f7f8",
+  "theme_color": "#1f6fbf",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

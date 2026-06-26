@@ -12,6 +12,7 @@ const mimeTypes = {
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   ".svg": "image/svg+xml",
 };
 
@@ -97,23 +98,41 @@ function severityScore(kind, loss) {
   return base + Math.round(Number(loss || 0) * 100);
 }
 
-function principleForMoment(game, moment) {
+function lessonPrinciple(moment) {
   const phase = moment.moveNumber <= 10 ? "opening" : moment.moveNumber >= 35 ? "endgame" : "middlegame";
-  const best = moment.best ? ` The candidate move Lichess points to is ${moment.best}.` : "";
 
   if (moment.kind === "Blunder" || Number(moment.loss || 0) >= 2) {
-    return `Tactical safety check: before committing, scan checks, captures, threats, and loose pieces for both sides.${best} After you find the move, name the concrete threat it stops or creates.`;
+    return {
+      name: "Tactical safety and forcing moves",
+      explanation: "Scan checks, captures, threats, and loose pieces before committing. The best move usually works because it changes the forcing sequence, wins material, prevents a tactic, or creates a direct threat.",
+    };
   }
 
   if (phase === "opening") {
-    return `Opening principle: develop pieces, fight for the center, keep your king safe, and avoid moving the same piece without a concrete reason.${best} After you find the move, say which opening principle it improves.`;
+    return {
+      name: "Opening development and central control",
+      explanation: "Improve your pieces, fight for central squares, keep your king safe, and avoid automatic moves that ignore the opponent's last idea.",
+    };
   }
 
   if (phase === "endgame") {
-    return `Endgame principle: activate the king, improve the worst piece, create passed pawns, and calculate pawn races carefully.${best} After you find the move, name the long-term endgame target.`;
+    return {
+      name: "Endgame activity and conversion",
+      explanation: "Activate the king, improve the worst piece, create or stop passed pawns, and calculate pawn races before choosing a move.",
+    };
   }
 
-  return `Middlegame principle: improve your worst piece, look for forcing moves, and ask what your opponent wants next.${best} After you find the move, name the plan it supports.`;
+  return {
+    name: "Improve the worst piece and limit counterplay",
+    explanation: "Ask what your opponent wants, then choose a move that improves your coordination while reducing their active ideas.",
+  };
+}
+
+function principleForMoment(game, moment) {
+  const principle = lessonPrinciple(moment);
+  const best = moment.best ? ` The candidate move Lichess points to is ${moment.best}.` : "";
+
+  return `Key principle: ${principle.name}. ${principle.explanation}${best} After finding the move, say the principle out loud and name the concrete reason it works here.`;
 }
 
 function promptForMoment(game, moment) {

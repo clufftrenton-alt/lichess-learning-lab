@@ -10,6 +10,12 @@ npm start
 
 Open <http://localhost:5177>.
 
+## Phone install path
+
+The project now includes a web app manifest, so it can be installed like an app from a mobile browser once it is hosted on HTTPS.
+
+For a true Android APK, the app needs to be wrapped with Android tooling such as Capacitor or Bubblewrap after it is hosted. This local workspace does not currently include the Android SDK needed to build an APK directly.
+
 ## Lichess token
 
 Create a token at <https://lichess.org/account/oauth/token/create> with:
