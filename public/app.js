@@ -1,19 +1,55 @@
 const state = {
   token: "",
   username: "",
+  apiBase: "",
   games: [],
   selected: new Map(),
 };
 
 const $ = (id) => document.getElementById(id);
 
+const storageKeys = {
+  apiBase: "learningLabApiBase",
+  token: "learningLabToken",
+  username: "learningLabUsername",
+};
+
 function loadSavedSettings() {
-  const savedApiBase = localStorage.getItem("learningLabApiBase") || "";
-  if ($("apiBase")) $("apiBase").value = savedApiBase;
+  state.apiBase = localStorage.getItem(storageKeys.apiBase) || "";
+  state.token = localStorage.getItem(storageKeys.token) || "";
+  state.username = localStorage.getItem(storageKeys.username) || "";
+  if ($("apiBase")) $("apiBase").value = state.apiBase;
+  if ($("token")) $("token").value = state.token;
+  if ($("username")) $("username").value = state.username;
 }
 
 function saveSettings() {
-  if ($("apiBase")) localStorage.setItem("learningLabApiBase", $("apiBase").value.trim());
+  state.apiBase = $("apiBase")?.value.trim().replace(/\/$/, "") || "";
+  state.token = $("token")?.value.trim() || "";
+  state.username = $("username")?.value.trim() || state.username;
+  localStorage.setItem(storageKeys.apiBase, state.apiBase);
+  localStorage.setItem(storageKeys.token, state.token);
+  localStorage.setItem(storageKeys.username, state.username);
+}
+
+function clearSettings() {
+  Object.values(storageKeys).forEach((key) => localStorage.removeItem(key));
+  state.apiBase = "";
+  state.token = "";
+  state.username = "";
+  if ($("apiBase")) $("apiBase").value = "";
+  if ($("token")) $("token").value = "";
+  if ($("username")) $("username").value = "";
+  setConnectionView(false);
+}
+
+function setConnectionView(connected) {
+  $("setupPanel").hidden = connected;
+  $("connectedPanel").hidden = !connected;
+  if (!connected) return;
+
+  $("connectedUser").textContent = state.username || "Connected";
+  $("connectedBackend").textContent = state.apiBase ? state.apiBase : "Local backend";
 }
 
 function setStatus(message, type = "info") {
@@ -24,9 +60,8 @@ function setStatus(message, type = "info") {
 }
 
 async function postJson(url, body) {
-  const apiBase = $("apiBase")?.value.trim().replace(/\/$/, "") || "";
   saveSettings();
-  const response = await fetch(`${apiBase}${url}`, {
+  const response = await fetch(`${state.apiBase}${url}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -34,6 +69,24 @@ async function postJson(url, body) {
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Request failed.");
   return data;
+}
+
+async function connectToLichess({ silent = false } = {}) {
+  state.token = $("token").value.trim();
+  if (!state.token) {
+    setConnectionView(false);
+    if (!silent) setStatus("Paste a Lichess token first.", "error");
+    return false;
+  }
+
+  if (!silent) setStatus("Connecting to Lichess...");
+  const profile = await postJson("/api/profile", { token: state.token });
+  state.username = profile.username || profile.id || $("username").value.trim();
+  $("username").value = state.username;
+  saveSettings();
+  setConnectionView(true);
+  setStatus(`Connected as ${state.username}.`, "success");
+  return true;
 }
 
 function selectedItems() {
@@ -223,17 +276,22 @@ async function createStudy() {
 }
 
 $("connect").addEventListener("click", async () => {
-  state.token = $("token").value.trim();
-  if (!state.token) return setStatus("Paste a Lichess token first.", "error");
-  setStatus("Connecting to Lichess...");
   try {
-    const profile = await postJson("/api/profile", { token: state.token });
-    state.username = profile.username || profile.id || "";
-    $("username").value = state.username;
-    setStatus(`Connected as ${state.username}.`, "success");
+    await connectToLichess();
   } catch (error) {
+    setConnectionView(false);
     setStatus(error.message, "error");
   }
+});
+
+$("editConnection").addEventListener("click", () => {
+  setConnectionView(false);
+  setStatus("Connection settings are open.", "info");
+});
+
+$("clearConnection").addEventListener("click", () => {
+  clearSettings();
+  setStatus("This device forgot the saved connection.", "success");
 });
 
 $("loadGames").addEventListener("click", async () => {
@@ -263,4 +321,13 @@ $("autoStudy").addEventListener("click", async () => {
 
 setDefaultDateRange();
 loadSavedSettings();
+if (state.token) {
+  setConnectionView(true);
+  connectToLichess({ silent: true }).catch((error) => {
+    setConnectionView(false);
+    setStatus(`Saved connection needs attention: ${error.message}`, "error");
+  });
+} else {
+  setConnectionView(false);
+}
 renderGames();

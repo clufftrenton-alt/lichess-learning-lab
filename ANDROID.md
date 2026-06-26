@@ -40,3 +40,5 @@ Good options:
 - For local testing on the same Wi-Fi, run the server on your computer and use `http://YOUR-COMPUTER-IP:5177`.
 
 The desktop browser version should leave **Backend URL** blank.
+
+After the first successful connection, the Android app remembers the backend URL, Lichess token, and username on that device. Use **Edit** to change the connection or **Forget** to clear saved settings.

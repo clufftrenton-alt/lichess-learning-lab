@@ -156,6 +156,32 @@ button.primary:hover {
   line-height: 1.4;
 }
 
+.setup-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.account-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #cddce8;
+  border-radius: 8px;
+  padding: 14px;
+  background: #f7fbff;
+}
+
+.account-panel span,
+.account-panel small {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.account-panel strong {
+  display: block;
+  margin: 2px 0;
+}
+
 .workspace {
   display: grid;
   grid-template-rows: auto auto 1fr;

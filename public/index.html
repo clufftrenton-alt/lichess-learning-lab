@@ -19,25 +19,39 @@
           </div>
         </div>
 
-        <label>
-          Lichess token
-          <input id="token" type="password" autocomplete="off" placeholder="Token with study:write">
-        </label>
+        <section id="connectedPanel" class="account-panel" hidden>
+          <div>
+            <span>Connected</span>
+            <strong id="connectedUser">Not connected</strong>
+            <small id="connectedBackend">Local backend</small>
+          </div>
+          <div class="row">
+            <button id="editConnection">Edit</button>
+            <button id="clearConnection">Forget</button>
+          </div>
+        </section>
 
-        <div class="row">
-          <button id="connect" class="primary">Connect</button>
-          <a class="subtle" href="https://lichess.org/account/oauth/token/create?scopes[]=study:write" target="_blank" rel="noreferrer">Get token</a>
-        </div>
+        <section id="setupPanel" class="setup-panel">
+          <label>
+            Lichess token
+            <input id="token" type="password" autocomplete="off" placeholder="Token with study:write">
+          </label>
 
-        <label>
-          Username
-          <input id="username" placeholder="Your Lichess username">
-        </label>
+          <div class="row">
+            <button id="connect" class="primary">Connect and save</button>
+            <a class="subtle" href="https://lichess.org/account/oauth/token/create?scopes[]=study:write" target="_blank" rel="noreferrer">Get token</a>
+          </div>
 
-        <label>
-          Backend URL
-          <input id="apiBase" placeholder="Leave blank on this computer">
-        </label>
+          <label>
+            Username
+            <input id="username" placeholder="Your Lichess username">
+          </label>
+
+          <label>
+            Backend URL
+            <input id="apiBase" placeholder="Leave blank on this computer">
+          </label>
+        </section>
 
         <label>
           Max games in range
@@ -60,7 +74,7 @@
         <button id="autoStudy" class="primary">Auto-create lesson</button>
 
         <div class="notice">
-          Your token is used only to call Lichess. Leave Backend URL blank here; on phone, use a hosted backend URL.
+          Your connection is remembered on this device. Use Edit if your token or backend URL changes.
         </div>
       </section>
 
