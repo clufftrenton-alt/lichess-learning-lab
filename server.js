@@ -86,6 +86,16 @@ function classifyLoss(loss) {
   return null;
 }
 
+function severityScore(kind, loss) {
+  const base = {
+    Blunder: 300,
+    Mistake: 200,
+    Inaccuracy: 100,
+    "Critical moment": 80,
+  }[kind] || 0;
+  return base + Math.round(Number(loss || 0) * 100);
+}
+
 function playerColor(game, username) {
   const lower = username.toLowerCase();
   const whiteName = game.players?.white?.user?.name?.toLowerCase();
@@ -141,13 +151,14 @@ function findMoments(game, username) {
         san: moves[i],
         kind: kind || "Critical moment",
         loss: loss === null ? null : Number(loss.toFixed(2)),
+        score: severityScore(kind || "Critical moment", loss),
         best,
         comment: current?.judgment?.comment || "",
       });
     }
   }
 
-  return moments.slice(0, 12);
+  return moments.sort((a, b) => b.score - a.score).slice(0, 12);
 }
 
 function escapePgnComment(text) {
@@ -207,13 +218,18 @@ async function handleApi(req, res) {
     const username = String(body.username || "").trim();
     if (!username) return sendJson(res, 400, { error: "Missing Lichess username." });
     const params = new URLSearchParams({
-      max: String(Math.min(Math.max(Number(body.max || 20), 1), 100)),
+      max: String(Math.min(Math.max(Number(body.max || 100), 1), 300)),
       analysed: "true",
       evals: "true",
       opening: "true",
       clocks: "true",
       pgnInJson: "true",
     });
+    const since = Date.parse(`${body.since || ""}T00:00:00.000Z`);
+    const until = Date.parse(`${body.until || ""}T23:59:59.999Z`);
+    if (!Number.isNaN(since)) params.set("since", String(since));
+    if (!Number.isNaN(until)) params.set("until", String(until));
+
     const text = await lichessFetch(`${LICHESS}/api/games/user/${encodeURIComponent(username)}?${params}`, {
       headers: {
         Accept: "application/x-ndjson",

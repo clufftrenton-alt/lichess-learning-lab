@@ -33,11 +33,24 @@
         </label>
 
         <label>
-          Games to review
-          <input id="maxGames" type="number" min="1" max="100" value="20">
+          Max games in range
+          <input id="maxGames" type="number" min="1" max="300" value="100">
         </label>
 
+        <div class="date-grid">
+          <label>
+            From
+            <input id="startDate" type="date">
+          </label>
+
+          <label>
+            To
+            <input id="endDate" type="date">
+          </label>
+        </div>
+
         <button id="loadGames">Review games</button>
+        <button id="autoStudy" class="primary">Auto-create study</button>
 
         <div class="notice">
           Your token is used only by this local app to call Lichess. It is not saved on disk.
@@ -48,7 +61,7 @@
         <div class="toolbar">
           <div>
             <h2>Critical Moments</h2>
-            <p id="summary">Connect, load games, then choose what belongs in your study.</p>
+            <p id="summary">Connect, choose a date range, then auto-create a study from your most important moments.</p>
           </div>
           <div class="study-actions">
             <input id="studyName" placeholder="Study name">
@@ -60,7 +73,7 @@
         <section id="games" class="games empty">
           <div class="empty-state">
             <h3>No games loaded yet</h3>
-            <p>Analysed Lichess games will appear here with blunders, mistakes, inaccuracies, and sharp evaluation swings.</p>
+            <p>Analysed Lichess games in your date range will appear here with the most important moments selected automatically.</p>
           </div>
         </section>
       </section>

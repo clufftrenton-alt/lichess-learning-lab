@@ -29,6 +29,15 @@ function selectedItems() {
   return Array.from(state.selected.values());
 }
 
+function dateRangeLabel() {
+  const start = $("startDate").value;
+  const end = $("endDate").value;
+  if (start && end) return `${start} to ${end}`;
+  if (start) return `from ${start}`;
+  if (end) return `through ${end}`;
+  return "latest games";
+}
+
 function momentKey(gameId, ply) {
   return `${gameId}:${ply}`;
 }
@@ -37,8 +46,37 @@ function updateSummary() {
   const momentCount = state.games.reduce((total, game) => total + game.moments.length, 0);
   const selected = selectedItems().length;
   $("summary").textContent = state.games.length
-    ? `${state.games.length} analysed games, ${momentCount} learnable moments, ${selected} selected.`
-    : "Connect, load games, then choose what belongs in your study.";
+    ? `${state.games.length} analysed games, ${momentCount} learnable moments, ${selected} auto-selected.`
+    : "Connect, choose a date range, then auto-create a study from your most important moments.";
+}
+
+function toDateInputValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function setDefaultDateRange() {
+  const today = new Date();
+  const monthAgo = new Date(today);
+  monthAgo.setDate(today.getDate() - 30);
+  $("startDate").value = toDateInputValue(monthAgo);
+  $("endDate").value = toDateInputValue(today);
+}
+
+function autoSelectMoments() {
+  state.selected.clear();
+
+  for (const game of state.games) {
+    const sorted = [...game.moments].sort((a, b) => (b.score || 0) - (a.score || 0));
+    const serious = sorted.filter((moment) => ["Blunder", "Mistake"].includes(moment.kind));
+    const chosen = serious.length ? serious.slice(0, 3) : sorted.slice(0, 1);
+
+    for (const moment of chosen) {
+      state.selected.set(momentKey(game.id, moment.ply), { ...moment, gameId: game.id });
+    }
+  }
 }
 
 function renderGames() {
@@ -50,7 +88,7 @@ function renderGames() {
     root.innerHTML = `
       <div class="empty-state">
         <h3>No games loaded yet</h3>
-        <p>Analysed Lichess games will appear here with blunders, mistakes, inaccuracies, and sharp evaluation swings.</p>
+        <p>Analysed Lichess games in your date range will appear here with the most important moments selected automatically.</p>
       </div>
     `;
     updateSummary();
@@ -60,12 +98,12 @@ function renderGames() {
   for (const game of state.games) {
     const article = document.createElement("article");
     article.className = "game-card";
-    const opening = game.opening?.name ? `<span>${game.opening.name}</span>` : "";
+    const opening = game.opening?.name ? `<span>${escapeHtml(game.opening.name)}</span>` : "";
     article.innerHTML = `
       <header>
         <div>
           <h3>${escapeHtml(game.title)}</h3>
-          <p>${escapeHtml(game.color)} · ${escapeHtml(game.speed || "game")} · ${escapeHtml(game.result)}</p>
+          <p>${escapeHtml(game.color)} - ${escapeHtml(game.speed || "game")} - ${escapeHtml(game.result)}</p>
         </div>
         <a href="${game.url}" target="_blank" rel="noreferrer">Open</a>
       </header>
@@ -82,13 +120,14 @@ function renderGames() {
         const checked = state.selected.has(key) ? "checked" : "";
         const best = moment.best ? `<span>Candidate: ${escapeHtml(moment.best)}</span>` : "";
         const loss = moment.loss ? `<span>Drop: ${moment.loss} pawns</span>` : "";
+        const priority = Math.round(moment.score || 0);
         const item = document.createElement("label");
         item.className = "moment";
         item.innerHTML = `
           <input type="checkbox" data-game="${game.id}" data-ply="${moment.ply}" ${checked}>
           <div>
             <strong>${escapeHtml(moment.kind)}: ${moment.moveNumber}. ${escapeHtml(moment.san)}</strong>
-            <p>${loss}${best}</p>
+            <p>${loss}${best}<span>Priority: ${priority}</span></p>
             ${moment.comment ? `<small>${escapeHtml(moment.comment)}</small>` : ""}
           </div>
         `;
@@ -123,6 +162,55 @@ function escapeHtml(value) {
   })[char]);
 }
 
+async function loadGames({ autoSelect = true } = {}) {
+  state.token = $("token").value.trim();
+  state.username = $("username").value.trim();
+  if (!state.username) {
+    setStatus("Enter your Lichess username.", "error");
+    return false;
+  }
+  if ($("startDate").value && $("endDate").value && $("startDate").value > $("endDate").value) {
+    setStatus("The start date needs to be before the end date.", "error");
+    return false;
+  }
+
+  const range = dateRangeLabel();
+  setStatus(`Loading analysed games from ${range}...`);
+  const data = await postJson("/api/games", {
+    token: state.token,
+    username: state.username,
+    max: $("maxGames").value,
+    since: $("startDate").value,
+    until: $("endDate").value,
+  });
+  state.games = data.games;
+  state.selected.clear();
+  if (autoSelect) autoSelectMoments();
+  renderGames();
+  setStatus(`Loaded ${state.games.length} games from ${range}.`, "success");
+  return true;
+}
+
+async function createStudy() {
+  state.token = $("token").value.trim();
+  state.username = $("username").value.trim();
+  const selected = selectedItems();
+  if (!state.token) return setStatus("A Lichess token is needed to create a study.", "error");
+  if (!selected.length) return setStatus("No critical moments were found to add to a study.", "error");
+
+  const studyName = $("studyName").value || `Learning Lab - ${dateRangeLabel()}`;
+  setStatus(`Creating a study from ${selected.length} selected moments...`);
+  const data = await postJson("/api/create-study", {
+    token: state.token,
+    username: state.username,
+    name: studyName,
+    selected,
+    games: state.games,
+  });
+  setStatus(`Created ${data.chaptersCreated} chapters: ${data.url}`, "success");
+  window.open(data.url, "_blank", "noreferrer");
+}
+
 $("connect").addEventListener("click", async () => {
   state.token = $("token").value.trim();
   if (!state.token) return setStatus("Paste a Lichess token first.", "error");
@@ -138,45 +226,29 @@ $("connect").addEventListener("click", async () => {
 });
 
 $("loadGames").addEventListener("click", async () => {
-  state.token = $("token").value.trim();
-  state.username = $("username").value.trim();
-  if (!state.username) return setStatus("Enter your Lichess username.", "error");
-  setStatus("Loading analysed games from Lichess...");
   try {
-    const data = await postJson("/api/games", {
-      token: state.token,
-      username: state.username,
-      max: $("maxGames").value,
-    });
-    state.games = data.games;
-    state.selected.clear();
-    renderGames();
-    setStatus(`Loaded ${state.games.length} games.`, "success");
+    await loadGames({ autoSelect: true });
   } catch (error) {
     setStatus(error.message, "error");
   }
 });
 
 $("createStudy").addEventListener("click", async () => {
-  state.token = $("token").value.trim();
-  state.username = $("username").value.trim();
-  const selected = selectedItems();
-  if (!state.token) return setStatus("A Lichess token is needed to create a study.", "error");
-  if (!selected.length) return setStatus("Select at least one moment first.", "error");
-  setStatus("Creating your Lichess study...");
   try {
-    const data = await postJson("/api/create-study", {
-      token: state.token,
-      username: state.username,
-      name: $("studyName").value,
-      selected,
-      games: state.games,
-    });
-    setStatus(`Created ${data.chaptersCreated} chapters: ${data.url}`, "success");
-    window.open(data.url, "_blank", "noreferrer");
+    await createStudy();
   } catch (error) {
     setStatus(error.message, "error");
   }
 });
 
+$("autoStudy").addEventListener("click", async () => {
+  try {
+    const loaded = await loadGames({ autoSelect: true });
+    if (loaded) await createStudy();
+  } catch (error) {
+    setStatus(error.message, "error");
+  }
+});
+
+setDefaultDateRange();
 renderGames();

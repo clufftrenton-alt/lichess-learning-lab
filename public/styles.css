@@ -134,6 +134,12 @@ button.primary:hover {
   align-items: center;
 }
 
+.date-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .subtle {
   color: var(--blue);
   font-size: 14px;
