@@ -96,6 +96,25 @@ function severityScore(kind, loss) {
   return base + Math.round(Number(loss || 0) * 100);
 }
 
+function principleForMoment(game, moment) {
+  const phase = moment.moveNumber <= 10 ? "opening" : moment.moveNumber >= 35 ? "endgame" : "middlegame";
+  const best = moment.best ? ` The candidate move Lichess points to is ${moment.best}.` : "";
+
+  if (moment.kind === "Blunder" || Number(moment.loss || 0) >= 2) {
+    return `Tactical safety check: before committing, scan checks, captures, threats, and loose pieces for both sides.${best} After you find the move, name the concrete threat it stops or creates.`;
+  }
+
+  if (phase === "opening") {
+    return `Opening principle: develop pieces, fight for the center, keep your king safe, and avoid moving the same piece without a concrete reason.${best} After you find the move, say which opening principle it improves.`;
+  }
+
+  if (phase === "endgame") {
+    return `Endgame principle: activate the king, improve the worst piece, create passed pawns, and calculate pawn races carefully.${best} After you find the move, name the long-term endgame target.`;
+  }
+
+  return `Middlegame principle: improve your worst piece, look for forcing moves, and ask what your opponent wants next.${best} After you find the move, name the plan it supports.`;
+}
+
 function playerColor(game, username) {
   const lower = username.toLowerCase();
   const whiteName = game.players?.white?.user?.name?.toLowerCase();
@@ -188,6 +207,8 @@ function buildAnnotatedPgn(game, username, selectedMoments) {
     const moment = momentMap.get(i + 1);
     if (moment) {
       const parts = [
+        `Interactive lesson prompt: find a better move before ${moment.moveNumber}. ${moment.san}`,
+        principleForMoment(game, moment),
         `${moment.kind} on move ${moment.moveNumber}`,
         moment.loss ? `eval dropped about ${moment.loss} pawns` : "",
         moment.best ? `candidate: ${moment.best}` : "",
@@ -266,7 +287,11 @@ async function handleApi(req, res) {
     const studyForm = new URLSearchParams({
       name: studyName,
       visibility: "private",
-      computer: "true",
+      computer: "owner",
+      explorer: "owner",
+      chat: "owner",
+      shareable: "owner",
+      cloneable: "nobody",
     });
     const studyText = await lichessFetch(`${LICHESS}/api/study`, {
       method: "POST",
@@ -296,6 +321,7 @@ async function handleApi(req, res) {
       const form = new URLSearchParams({
         name: game.title.slice(0, 80),
         pgn,
+        mode: "gamebook",
       });
       const chapterText = await lichessFetch(`${LICHESS}/api/study/${studyId}/import-pgn`, {
         method: "POST",

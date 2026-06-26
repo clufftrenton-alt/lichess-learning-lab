@@ -47,7 +47,7 @@ function updateSummary() {
   const selected = selectedItems().length;
   $("summary").textContent = state.games.length
     ? `${state.games.length} analysed games, ${momentCount} learnable moments, ${selected} auto-selected.`
-    : "Connect, choose a date range, then auto-create a study from your most important moments.";
+    : "Connect, choose a date range, then auto-create a lesson from your most important moments.";
 }
 
 function toDateInputValue(date) {
@@ -199,7 +199,7 @@ async function createStudy() {
   if (!selected.length) return setStatus("No critical moments were found to add to a study.", "error");
 
   const studyName = $("studyName").value || `Learning Lab - ${dateRangeLabel()}`;
-  setStatus(`Creating a study from ${selected.length} selected moments...`);
+  setStatus(`Creating an interactive lesson from ${selected.length} selected moments...`);
   const data = await postJson("/api/create-study", {
     token: state.token,
     username: state.username,
