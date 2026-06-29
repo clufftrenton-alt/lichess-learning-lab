@@ -34,6 +34,7 @@ function corsHeaders(origin) {
   const allowed = new Set([
     "http://localhost:5177",
     "http://127.0.0.1:5177",
+    "https://localhost",
     "capacitor://localhost",
     "ionic://localhost",
   ]);
@@ -389,6 +390,10 @@ async function buildLessonPgn(game, username, moment) {
 
 async function handleApi(req, res) {
   const body = await readJson(req);
+
+  if (req.url === "/api/health" && req.method === "POST") {
+    return sendJson(res, 200, { ok: true });
+  }
 
   if (req.url === "/api/profile" && req.method === "POST") {
     const text = await lichessFetch(`${LICHESS}/api/account`, {

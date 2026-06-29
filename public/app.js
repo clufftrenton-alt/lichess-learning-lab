@@ -61,11 +61,18 @@ function setStatus(message, type = "info") {
 
 async function postJson(url, body) {
   saveSettings();
-  const response = await fetch(`${state.apiBase}${url}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const target = `${state.apiBase}${url}`;
+  let response;
+  try {
+    response = await fetch(target, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch (error) {
+    const backend = state.apiBase || "this app's built-in local backend";
+    throw new Error(`Could not reach the backend at ${backend}. Check the Backend URL, make sure it starts with https://, and wait a minute if the host is waking up.`);
+  }
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Request failed.");
   return data;
